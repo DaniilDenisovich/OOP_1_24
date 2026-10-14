@@ -78,12 +78,19 @@ public class Department {
 
 
     public Employee findManagerNLevelsUp(int levelsUp) {
+        if (levelsUp <= 0) {
+            throw new IllegalArgumentException("levelsUp должен быть больше 0, передано: " + levelsUp);
+        }
         Department current = this;
-        for (int i = 0; i < levelsUp && current.parent != null; i++) {
+        for (int i = 0; i < levelsUp; i++) {
+            if (current.parent == null) {
+                return null; // Выше корня некуда идти
+            }
             current = current.parent;
         }
         return current.head;
     }
+
 
     public List<Employee> getAllSubordinates() {
         List<Employee> result = new ArrayList<>();
@@ -93,13 +100,14 @@ public class Department {
 
     private void collectSubordinates(Department dept, List<Employee> result) {
         for (Department child : dept.children) {
-            result.addAll(child.employees);
             if (child.head != null) {
                 result.add(child.head);
             }
+            result.addAll(child.employees);
             collectSubordinates(child, result);
         }
     }
+
 
     @Override
     public boolean equals(Object o) {
