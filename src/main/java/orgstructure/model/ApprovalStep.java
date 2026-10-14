@@ -5,7 +5,6 @@ import orgstructure.enums.Role;
 import orgstructure.enums.StepStatus;
 
 import java.time.LocalDate;
-import java.util.Objects;
 
 
 public class ApprovalStep {
@@ -13,6 +12,7 @@ public class ApprovalStep {
     private final Role requiredRole;
     private StepStatus status;
     private Employee approver;
+    private Employee expectedApprover;
     private LocalDate approvalDate;
     private final LocalDate createdDate;
 
@@ -45,18 +45,30 @@ public class ApprovalStep {
         return status;
     }
 
+
     public Employee getApprover() {
         return approver;
     }
+
+
+    public Employee getExpectedApprover() {
+        return expectedApprover;
+    }
+
+
+    public void setExpectedApprover(Employee expectedApprover) {
+        this.expectedApprover = expectedApprover;
+    }
+
 
     public LocalDate getApprovalDate() {
         return approvalDate;
     }
 
+
     public LocalDate getCreatedDate() {
         return createdDate;
     }
-
 
     public void approve(Employee employee) {
         if (status != StepStatus.PENDING) {
@@ -66,6 +78,7 @@ public class ApprovalStep {
         this.approvalDate = LocalDate.now();
         this.status = StepStatus.APPROVED;
     }
+
 
     public void reject(Employee employee) {
         if (status != StepStatus.PENDING) {

@@ -8,6 +8,7 @@ import java.util.Objects;
 public class Employee {
     private final String fullName;
     private final Role role;
+    private Department department;
 
 
     public Employee(String fullName, Role role) {
@@ -26,8 +27,19 @@ public class Employee {
         return fullName;
     }
 
+
     public Role getRole() {
         return role;
+    }
+
+
+    public Department getDepartment() {
+        return department;
+    }
+
+
+    public void setDepartment(Department department) {
+        this.department = department;
     }
 
 
