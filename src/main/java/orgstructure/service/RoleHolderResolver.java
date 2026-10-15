@@ -7,7 +7,7 @@ import orgstructure.model.Document;
 import orgstructure.model.Employee;
 
 /**
- * Правило: согласует сотрудник с указанной ролью в данном подразделении.
+  Правило: согласует сотрудник с указанной ролью в данном подразделении.
  */
 public class RoleHolderResolver implements ApproverResolver {
     public Employee resolve(Document document, Department currentDept, Role requiredRole) {

@@ -4,8 +4,8 @@ import orgstructure.enums.Role;
 import java.util.Objects;
 
 /**
- * Сотрудник организации.
- * Имеет ФИО, роль и ссылку на подразделение.
+  Сотрудник организации.
+  Имеет ФИО, роль и ссылку на подразделение.
  */
 public class Employee {
     private final String fullName;
@@ -13,10 +13,10 @@ public class Employee {
     private Department department;
 
     /**
-     * Создаёт сотрудника с указанным ФИО и ролью.
-     * @param fullName ФИО сотрудника (не должно быть null или пустым)
-     * @param role роль сотрудника в организации
-     * @throws IllegalArgumentException если fullName null или пустой, или role null
+      Создаёт сотрудника с указанным ФИО и ролью.
+      @param fullName ФИО сотрудника
+      @param role роль сотрудника в организации
+      @throws IllegalArgumentException если fullName null или пустой, или role null
      */
     public Employee(String fullName, Role role) {
         if (fullName == null || fullName.isBlank()) {
@@ -45,8 +45,8 @@ public class Employee {
     }
 
     /**
-     * Назначает сотрудника в подразделение.
-     * @param department подразделение
+      Назначает сотрудника в подразделение.
+      @param department подразделение
      */
     public void setDepartment(Department department) {
         this.department = department;

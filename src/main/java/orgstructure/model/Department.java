@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Подразделение организации.
- * Формирует дерево: каждое подразделение может иметь дочерние подразделения и ссылку на родительское.
+  Подразделение организации.
+  Формирует дерево: каждое подразделение может иметь дочерние подразделения и ссылку на родительское.
  */
 public class Department {
     private final String name;
@@ -17,9 +17,9 @@ public class Department {
     private Department parent;
 
     /**
-     * Создаёт подразделение с указанным названием.
-     * @param name название подразделения (не должно быть null или пустым)
-     * @throws IllegalArgumentException если name null или пустой
+      Создаёт подразделение с указанным названием.
+      @param name название подразделения
+      @throws IllegalArgumentException если name null или пустой
      */
     public Department(String name) {
         if (name == null || name.isBlank()) {
@@ -41,40 +41,40 @@ public class Department {
     }
 
     /**
-     * Назначает руководителя подразделения.
-     * @param head сотрудник, который становится руководителем
+      Назначает руководителя подразделения.
+      @param head сотрудник, который становится руководителем
      */
     public void setHead(Employee head) {
         this.head = head;
     }
 
     /**
-     * Возвращает список сотрудников подразделения.
-     * @return неизменяемая копия списка для сохранения инкапсуляции
+      Возвращает список сотрудников подразделения.
+      @return неизменяемая копия списка для сохранения инкапсуляции
      */
     public List<Employee> getEmployees() {
         return Collections.unmodifiableList(employees);
     }
 
     /**
-     * Добавляет сотрудника в подразделение.
-     * @param employee сотрудник для добавления
+      Добавляет сотрудника в подразделение.
+      @param employee сотрудник для добавления
      */
     public void addEmployee(Employee employee) {
         employees.add(employee);
     }
 
     /**
-     * Возвращает список дочерних подразделений.
-     * @return неизменяемая копия списка для сохранения инкапсуляции
+      Возвращает список дочерних подразделений.
+      @return неизменяемая копия списка для сохранения инкапсуляции
      */
     public List<Department> getChildren() {
         return Collections.unmodifiableList(children);
     }
 
     /**
-     * Добавляет дочернее подразделение и автоматически устанавливает ссылку на родителя.
-     * @param child дочернее подразделение
+      Добавляет дочернее подразделение и автоматически устанавливает ссылку на родителя.
+      @param child дочернее подразделение
      */
     public void addChild(Department child) {
         children.add(child);
@@ -87,14 +87,20 @@ public class Department {
     }
 
     /**
-     * Обходит дерево подразделений в глубину и собирает все подразделения.
-     * @return список всех подразделений в дереве
+      Обходит дерево подразделений в глубину и собирает все подразделения.
+      @return список всех подразделений в дереве
      */
     public List<Department> getAllDepartments() {
         List<Department> result = new ArrayList<>();
         collectDepartments(this, result);
         return result;
     }
+
+    /**
+      Рекурсивно обходит дерево подразделений в глубину и собирает все подразделения в список.
+      @param dept текущее подразделение для обработки
+      @param result список, в который добавляются найденные подразделения
+     */
 
     private void collectDepartments(Department dept, List<Department> result) {
         result.add(dept);
@@ -104,10 +110,10 @@ public class Department {
     }
 
     /**
-     * Находит руководителя на N уровней вверх от текущего подразделения.
-     * @param levelsUp количество уровней для подъёма (1 = непосредственный руководитель)
-     * @return руководитель или null, если достигли корня и выше нет
-     * @throws IllegalArgumentException если levelsUp <= 0
+      Находит руководителя на N уровней вверх от текущего подразделения.
+      @param levelsUp количество уровней для подъёма (1 = непосредственный руководитель)
+      @return руководитель или null, если достигли корня и выше нет
+      @throws IllegalArgumentException если levelsUp <= 0
      */
     public Employee findManagerNLevelsUp(int levelsUp) {
         if (levelsUp <= 0) {
@@ -124,14 +130,21 @@ public class Department {
     }
 
     /**
-     * Собирает всех подчинённых вглубь дерева.
-     * @return список всех сотрудников во всех дочерних подразделениях
+      Собирает всех подчинённых вглубь дерева.
+      @return список всех сотрудников во всех дочерних подразделениях
      */
     public List<Employee> getAllSubordinates() {
         List<Employee> result = new ArrayList<>();
         collectSubordinates(this, result);
         return result;
     }
+
+    /**
+      Рекурсивно обходит дочерние подразделения и собирает всех их сотрудников в список.
+      Включает руководителей дочерних подразделений и рядовых сотрудников.
+      @param dept текущее подразделение, чьих подчинённых нужно собрать
+      @param result список, в который добавляются найденные сотрудники
+     */
 
     private void collectSubordinates(Department dept, List<Employee> result) {
         for (Department child : dept.children) {
@@ -144,7 +157,7 @@ public class Department {
     }
 
     /**
-     * Проверяет равенство подразделений по названию.
+      Проверяет равенство подразделений по названию.
      */
     @Override
     public boolean equals(Object o) {
@@ -155,7 +168,7 @@ public class Department {
     }
 
     /**
-     * Вычисляет хеш-код на основе названия.
+      Вычисляет хеш-код на основе названия.
      */
     @Override
     public int hashCode() {

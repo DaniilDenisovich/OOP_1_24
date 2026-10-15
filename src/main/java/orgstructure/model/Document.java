@@ -7,8 +7,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Документ, проходящий процедуру согласования.
- * Содержит маршрут согласования из шагов и историю изменений статуса.
+  Документ, проходящий процедуру согласования.
+  Содержит маршрут согласования из шагов и историю изменений статуса.
  */
 public class Document {
     private final String title;
@@ -18,9 +18,9 @@ public class Document {
     private final LocalDate createdDate;
 
     /**
-     * Создаёт документ с указанным названием в статусе черновика.
-     * @param title название документа (не должно быть null или пустым)
-     * @throws IllegalArgumentException если title null или пустой
+      Создаёт документ с указанным названием в статусе черновика.
+      @param title название документа
+      @throws IllegalArgumentException если title null или пустой
      */
     public Document(String title) {
         if (title == null || title.isBlank()) {
@@ -45,30 +45,25 @@ public class Document {
     }
 
     /**
-     * Возвращает список шагов маршрута согласования.
-     * @return неизменяемая копия списка для сохранения инкапсуляции
+      Возвращает список шагов маршрута согласования.
+      @return неизменяемая копия списка для сохранения инкапсуляции
      */
     public List<ApprovalStep> getSteps() {
         return Collections.unmodifiableList(steps);
     }
 
     /**
-     * Возвращает историю изменений документа.
-     * @return неизменяемая копия списка записей истории
+      Возвращает историю изменений документа.
+      @return неизменяемая копия списка записей истории
      */
     public List<String> getHistory() {
         return Collections.unmodifiableList(history);
     }
 
-    /** @return дата создания документа */
-    public LocalDate getCreatedDate() {
-        return createdDate;
-    }
-
     /**
-     * Добавляет шаг в маршрут согласования.
-     * @param step шаг для добавления
-     * @throws IllegalStateException если документ не в статусе DRAFT
+      Добавляет шаг в маршрут согласования.
+      @param step шаг для добавления
+      @throws IllegalStateException если документ не в статусе DRAFT
      */
     public void addStep(ApprovalStep step) {
         if (status != DocumentStatus.DRAFT) {
@@ -78,8 +73,8 @@ public class Document {
     }
 
     /**
-     * Запускает процесс согласования.
-     * @throws IllegalStateException если документ не в статусе DRAFT или нет шагов
+      Запускает процесс согласования.
+      @throws IllegalStateException если документ не в статусе DRAFT или нет шагов
      */
     public void startApproval() {
         if (status != DocumentStatus.DRAFT) {
@@ -93,8 +88,8 @@ public class Document {
     }
 
     /**
-     * Возвращает текущий шаг, ожидающий согласования.
-     * @return текущий шаг или null, если все шаги завершены
+      Возвращает текущий шаг, ожидающий согласования.
+      @return текущий шаг или null, если все шаги завершены
      */
     public ApprovalStep getCurrentStep() {
         for (ApprovalStep step : steps) {
@@ -106,7 +101,7 @@ public class Document {
     }
 
     /**
-     * Обновляет статус документа на основе завершения шагов.
+      Обновляет статус документа на основе завершения шагов.
      */
     public void updateStatus() {
         boolean allApproved = true;

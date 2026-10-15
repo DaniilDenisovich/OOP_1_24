@@ -13,18 +13,24 @@ import orgstructure.service.ApprovalService;
 
 import java.util.List;
 
+/**
+  Создаёт оргструктуру из 30+ объектов и последовательно демонстрирует все операции
+ */
 
 public class Demo {
-
+    /**
+      Точка входа в программу.
+      Последовательно выполняет 10 разделов демонстрации.
+     */
     public static void main(String[] args) {
-        System.out.println("=== Демонстрация: Оргструктура и согласование документов ===\n");
+        System.out.println(" Демонстрация: Оргструктура и согласование документов \n");
 
-        System.out.println("--- 1. Создание оргструктуры ---");
+        System.out.println(" 1. Создание оргструктуры ");
         Department company = createOrganization();
         printDepartmentTree(company, 0);
         System.out.println();
 
-        System.out.println("--- 2. Обход дерева подразделений ---");
+        System.out.println("2. Обход дерева подразделений ");
         ApprovalService service = new ApprovalService();
         List<Department> allDepts = service.getAllDepartments(company);
         System.out.println("Всего подразделений в компании: " + allDepts.size());
@@ -33,7 +39,7 @@ public class Demo {
         }
         System.out.println();
 
-        System.out.println("--- 3. Поиск руководителя на N уровней вверх ---");
+        System.out.println(" 3. Поиск руководителя на N уровней вверх ");
         Employee engineer = findEmployee(company, "Инженер 1");
         if (engineer != null) {
             System.out.println("Сотрудник: " + engineer.getFullName() + " из " + engineer.getDepartment().getName());
@@ -46,7 +52,7 @@ public class Demo {
         }
         System.out.println();
 
-        System.out.println("--- 4. Поиск всех подчинённых вглубь ---");
+        System.out.println(" 4. Поиск всех подчинённых вглубь ");
         Department itDept = findDepartment(company, "IT отдел");
         if (itDept != null) {
             List<Employee> subordinates = service.getAllSubordinates(itDept);
@@ -57,7 +63,7 @@ public class Demo {
         }
         System.out.println();
 
-        System.out.println("--- 5. Построение маршрута согласования ---");
+        System.out.println(" 5. Построение маршрута согласования ");
         Document doc = new Document("Договор на поставку оборудования");
         System.out.println("Создан документ: " + doc.getTitle() + " [статус: " + doc.getStatus().getDisplayName() + "]");
 
@@ -73,12 +79,12 @@ public class Demo {
         }
         System.out.println();
 
-        System.out.println("--- 6. Запуск согласования ---");
+        System.out.println("6. Запуск согласования ");
         doc.startApproval();
         System.out.println("Документ переведён в статус: " + doc.getStatus().getDisplayName());
         System.out.println();
 
-        System.out.println("--- 7. Согласование шагов ---");
+        System.out.println("7. Согласование шагов ");
         for (ApprovalStep step : doc.getSteps()) {
             Employee expectedApprover = step.getExpectedApprover();
             System.out.println("Шаг: " + step.getRule().getDisplayName());
@@ -92,14 +98,14 @@ public class Demo {
             System.out.println();
         }
 
-        System.out.println("--- 8. История документа ---");
+        System.out.println(" 8. История документа ");
         System.out.println("История изменений:");
         for (String entry : doc.getHistory()) {
             System.out.println("  - " + entry);
         }
         System.out.println();
 
-        System.out.println("--- 9. Попытка согласовать чужой шаг (демонстрация исключения) ---");
+        System.out.println(" 9. Попытка согласовать чужой шаг (демонстрация исключения) ");
         Document doc2 = new Document("Служебная записка");
         service.buildRoute(doc2, itDept, List.of(ApproverRule.DIRECT_MANAGER));
         doc2.startApproval();
@@ -117,7 +123,7 @@ public class Demo {
         }
         System.out.println();
 
-        System.out.println("--- 10. Отклонение шага ---");
+        System.out.println(" 10. Отклонение шага ");
         Document doc3 = new Document("Заявка на отпуск");
         service.buildRoute(doc3, itDept, List.of(ApproverRule.DIRECT_MANAGER, ApproverRule.DEPARTMENT_HEAD));
         doc3.startApproval();
@@ -129,7 +135,7 @@ public class Demo {
         }
         System.out.println();
 
-        System.out.println("=== Демонстрация завершена ===");
+        System.out.println(" Демонстрация завершена ");
     }
 
     private static Department createOrganization() {
@@ -211,6 +217,11 @@ public class Demo {
         return company;
     }
 
+    /**
+      Рекурсивно выводит дерево подразделений.
+      @param dept текущее подразделение
+      @param level уровень вложенности для отступа
+     */
 
     private static void printDepartmentTree(Department dept, int level) {
         String indent = "  ".repeat(level);
@@ -220,6 +231,12 @@ public class Demo {
         }
     }
 
+    /**
+      Ищет сотрудника по ФИО во всех подразделениях дерева.
+      @param root корневое подразделение для поиска
+      @param fullName ФИО сотрудника
+      @return найденный сотрудник или null
+     */
 
     private static Employee findEmployee(Department root, String fullName) {
         for (Department dept : root.getAllDepartments()) {
@@ -234,7 +251,12 @@ public class Demo {
         }
         return null;
     }
-
+    /**
+      Ищет подразделение по названию во всех подразделениях дерева.
+      @param root корневое подразделение для поиска
+      @param name название подразделения
+      @return найденное подразделение или null
+     */
 
     private static Department findDepartment(Department root, String name) {
         for (Department dept : root.getAllDepartments()) {

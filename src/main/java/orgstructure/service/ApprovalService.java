@@ -11,15 +11,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Сервис для работы с оргструктурой и согласованием документов.
- * Реализует обход дерева, поиск руководителей и подчинённых,
- * построение маршрута согласования и логику согласования/отклонения.
+  Сервис для работы с оргструктурой и согласованием документов.
+  Реализует обход дерева, поиск руководителей и подчинённых,
+  построение маршрута согласования и логику согласования/отклонения.
  */
 public class ApprovalService {
     private final List<ApproverResolver> resolvers;
 
     /**
-     * Создаёт сервис с набором резолверов для разных правил выбора согласующего.
+      Создаёт сервис с набором резолверов для разных правил выбора согласующего.
      */
     public ApprovalService() {
         this.resolvers = new ArrayList<>();
@@ -29,20 +29,20 @@ public class ApprovalService {
     }
 
     /**
-     * Обходит дерево подразделений в глубину и собирает все подразделения.
-     * @param root корневое подразделение
-     * @return список всех подразделений в дереве
+      Обходит дерево подразделений в глубину и собирает все подразделения.
+      @param root корневое подразделение
+      @return список всех подразделений в дереве
      */
     public List<Department> getAllDepartments(Department root) {
         return root.getAllDepartments();
     }
 
     /**
-     * Находит руководителя на N уровней вверх от подразделения сотрудника.
-     * @param employee сотрудник, от которого поднимаемся
-     * @param levelsUp количество уровней для подъёма (1 = непосредственный руководитель)
-     * @return руководитель или null, если достигли корня
-     * @throws IllegalArgumentException если employee не назначен в подразделение
+      Находит руководителя на N уровней вверх от подразделения сотрудника.
+      @param employee сотрудник, от которого поднимаемся
+      @param levelsUp количество уровней для подъёма (1 = непосредственный руководитель)
+      @return руководитель или null, если достигли корня
+      @throws IllegalArgumentException если employee не назначен в подразделение
      */
     public Employee findManagerNLevelsUp(Employee employee, int levelsUp) {
         if (employee.getDepartment() == null) {
@@ -52,20 +52,20 @@ public class ApprovalService {
     }
 
     /**
-     * Собирает всех подчинённых вглубь дерева от указанного подразделения.
-     * @param department подразделение, от которого ищем подчинённых
-     * @return список всех сотрудников во всех дочерних подразделениях
+      Собирает всех подчинённых вглубь дерева от указанного подразделения.
+      @param department подразделение, от которого ищем подчинённых
+      @return список всех сотрудников во всех дочерних подразделениях
      */
     public List<Employee> getAllSubordinates(Department department) {
         return department.getAllSubordinates();
     }
 
     /**
-     * Строит маршрут согласования для документа по заданным правилам.
-     * @param document документ, для которого строится маршрут
-     * @param department подразделение, в контексте которого строится маршрут
-     * @param rules список правил выбора согласующего
-     * @throws IllegalStateException если документ не в статусе DRAFT
+      Строит маршрут согласования для документа по заданным правилам.
+      @param document документ, для которого строится маршрут
+      @param department подразделение, в контексте которого строится маршрут
+      @param rules список правил выбора согласующего
+      @throws IllegalStateException если документ не в статусе DRAFT
      */
     public void buildRoute(Document document, Department department, List<ApproverRule> rules) {
         if (document.getStatus() != orgstructure.enums.DocumentStatus.DRAFT) {
@@ -81,12 +81,12 @@ public class ApprovalService {
     }
 
     /**
-     * Согласует шаг маршрута указанным сотрудником.
-     * @param document документ
-     * @param step шаг для согласования
-     * @param employee сотрудник, который согласует
-     * @throws ApprovalException если сотрудник не является ожидаемым согласующим
-     * @throws IllegalStateException если документ не в статусе IN_APPROVAL или шаг уже завершён
+      Согласует шаг маршрута указанным сотрудником.
+      @param document документ
+      @param step шаг для согласования
+      @param employee сотрудник, который согласует
+      @throws ApprovalException если сотрудник не является ожидаемым согласующим
+      @throws IllegalStateException если документ не в статусе IN_APPROVAL или шаг уже завершён
      */
     public void approveStep(Document document, ApprovalStep step, Employee employee) {
         validateStepApproval(document, step, employee);
@@ -95,18 +95,27 @@ public class ApprovalService {
     }
 
     /**
-     * Отклоняет шаг маршрута указанным сотрудником.
-     * @param document документ
-     * @param step шаг для отклонения
-     * @param employee сотрудник, который отклоняет
-     * @throws ApprovalException если сотрудник не является ожидаемым согласующим
-     * @throws IllegalStateException если документ не в статусе IN_APPROVAL или шаг уже завершён
+      Отклоняет шаг маршрута указанным сотрудником.
+      @param document документ
+      @param step шаг для отклонения
+      @param employee сотрудник, который отклоняет
+      @throws ApprovalException если сотрудник не является ожидаемым согласующим
+      @throws IllegalStateException если документ не в статусе IN_APPROVAL или шаг уже завершён
      */
     public void rejectStep(Document document, ApprovalStep step, Employee employee) {
         validateStepApproval(document, step, employee);
         step.reject(employee);
         document.updateStatus();
     }
+
+    /**
+      Проверяет, имеет ли сотрудник право согласовать или отклонить указанный шаг.
+      @param document документ, проходящий согласование
+      @param step шаг маршрута, который пытаются согласовать или отклонить
+      @param employee сотрудник, выполняющий действие
+      @throws IllegalStateException если документ не в статусе IN_APPROVAL или шаг уже завершён
+      @throws ApprovalException если у шага нет ожидающего согласующего или сотрудник не тот
+     */
 
     private void validateStepApproval(Document document, ApprovalStep step, Employee employee) {
         if (document.getStatus() != orgstructure.enums.DocumentStatus.IN_APPROVAL) {

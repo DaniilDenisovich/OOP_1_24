@@ -6,8 +6,8 @@ import orgstructure.enums.StepStatus;
 import java.time.LocalDate;
 
 /**
- * Шаг маршрута согласования документа.
- * Определяет, кто должен согласовать документ, текущий статус и историю.
+  Шаг маршрута согласования документа.
+  Определяет, кто должен согласовать документ, текущий статус и историю.
  */
 public class ApprovalStep {
     private final ApproverRule rule;
@@ -19,10 +19,10 @@ public class ApprovalStep {
     private final LocalDate createdDate;
 
     /**
-     * Создаёт шаг маршрута с указанным правилом выбора согласующего.
-     * @param rule правило выбора согласующего
-     * @param requiredRole требуемая роль (только если rule = ROLE_HOLDER, иначе null)
-     * @throws IllegalArgumentException если rule = ROLE_HOLDER, но requiredRole = null
+      Создаёт шаг маршрута с указанным правилом выбора согласующего.
+      @param rule правило выбора согласующего
+      @param requiredRole требуемая роль
+      @throws IllegalArgumentException если rule = ROLE_HOLDER, но requiredRole = null
      */
     public ApprovalStep(ApproverRule rule, Role requiredRole) {
         if (rule == null) {
@@ -63,27 +63,17 @@ public class ApprovalStep {
     }
 
     /**
-     * Устанавливает ожидаемого согласующего.
-     * @param expectedApprover сотрудник, который должен согласовать
+      Устанавливает ожидаемого согласующего.
+      @param expectedApprover сотрудник, который должен согласовать
      */
     public void setExpectedApprover(Employee expectedApprover) {
         this.expectedApprover = expectedApprover;
     }
 
-    /** @return дата согласования или null, если шаг ещё не завершён */
-    public LocalDate getApprovalDate() {
-        return approvalDate;
-    }
-
-    /** @return дата создания шага */
-    public LocalDate getCreatedDate() {
-        return createdDate;
-    }
-
     /**
-     * Согласует шаг указанным сотрудником.
-     * @param employee сотрудник, который согласует
-     * @throws IllegalStateException если шаг уже завершён
+      Согласует шаг указанным сотрудником.
+      @param employee сотрудник, который согласует
+      @throws IllegalStateException если шаг уже завершён
      */
     public void approve(Employee employee) {
         if (status != StepStatus.PENDING) {
@@ -95,9 +85,9 @@ public class ApprovalStep {
     }
 
     /**
-     * Отклоняет шаг указанным сотрудником.
-     * @param employee сотрудник, который отклоняет
-     * @throws IllegalStateException если шаг уже завершён
+      Отклоняет шаг указанным сотрудником.
+      @param employee сотрудник, который отклоняет
+      @throws IllegalStateException если шаг уже завершён
      */
     public void reject(Employee employee) {
         if (status != StepStatus.PENDING) {
@@ -109,8 +99,8 @@ public class ApprovalStep {
     }
 
     /**
-     * Проверяет, завершён ли шаг (согласован или отклонён).
-     * @return true, если шаг завершён
+      Проверяет, завершён ли шаг.
+      @return true, если шаг завершён
      */
     public boolean isCompleted() {
         return status == StepStatus.APPROVED || status == StepStatus.REJECTED;
