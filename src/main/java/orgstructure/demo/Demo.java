@@ -19,13 +19,11 @@ public class Demo {
     public static void main(String[] args) {
         System.out.println("=== Демонстрация: Оргструктура и согласование документов ===\n");
 
-        // 1. Создание оргструктуры
         System.out.println("--- 1. Создание оргструктуры ---");
         Department company = createOrganization();
         printDepartmentTree(company, 0);
         System.out.println();
 
-        // 2. Обход дерева подразделений
         System.out.println("--- 2. Обход дерева подразделений ---");
         ApprovalService service = new ApprovalService();
         List<Department> allDepts = service.getAllDepartments(company);
@@ -35,7 +33,6 @@ public class Demo {
         }
         System.out.println();
 
-        // 3. Поиск руководителя на N уровней вверх
         System.out.println("--- 3. Поиск руководителя на N уровней вверх ---");
         Employee engineer = findEmployee(company, "Инженер 1");
         if (engineer != null) {
@@ -49,7 +46,6 @@ public class Demo {
         }
         System.out.println();
 
-        // 4. Поиск всех подчинённых вглубь
         System.out.println("--- 4. Поиск всех подчинённых вглубь ---");
         Department itDept = findDepartment(company, "IT отдел");
         if (itDept != null) {
@@ -61,7 +57,6 @@ public class Demo {
         }
         System.out.println();
 
-        // 5. Построение маршрута согласования
         System.out.println("--- 5. Построение маршрута согласования ---");
         Document doc = new Document("Договор на поставку оборудования");
         System.out.println("Создан документ: " + doc.getTitle() + " [статус: " + doc.getStatus().getDisplayName() + "]");
@@ -78,13 +73,11 @@ public class Demo {
         }
         System.out.println();
 
-        // 6. Запуск согласования
         System.out.println("--- 6. Запуск согласования ---");
         doc.startApproval();
         System.out.println("Документ переведён в статус: " + doc.getStatus().getDisplayName());
         System.out.println();
 
-        // 7. Согласование шагов
         System.out.println("--- 7. Согласование шагов ---");
         for (ApprovalStep step : doc.getSteps()) {
             Employee expectedApprover = step.getExpectedApprover();
@@ -99,7 +92,6 @@ public class Demo {
             System.out.println();
         }
 
-        // 8. История документа
         System.out.println("--- 8. История документа ---");
         System.out.println("История изменений:");
         for (String entry : doc.getHistory()) {
@@ -107,7 +99,6 @@ public class Demo {
         }
         System.out.println();
 
-        // 9. Попытка согласовать чужой шаг (исключение)
         System.out.println("--- 9. Попытка согласовать чужой шаг (демонстрация исключения) ---");
         Document doc2 = new Document("Служебная записка");
         service.buildRoute(doc2, itDept, List.of(ApproverRule.DIRECT_MANAGER));
@@ -126,7 +117,6 @@ public class Demo {
         }
         System.out.println();
 
-        // 10. Отклонение шага
         System.out.println("--- 10. Отклонение шага ---");
         Document doc3 = new Document("Заявка на отпуск");
         service.buildRoute(doc3, itDept, List.of(ApproverRule.DIRECT_MANAGER, ApproverRule.DEPARTMENT_HEAD));
@@ -143,14 +133,12 @@ public class Demo {
     }
 
     private static Department createOrganization() {
-        // Корневое подразделение
         Department company = new Department("ООО Ромашка");
         Employee director = new Employee("Иванов И.И.", Role.DIRECTOR);
         company.setHead(director);
         company.addEmployee(director);
         director.setDepartment(company);
 
-        // Бухгалтерия
         Department accounting = new Department("Бухгалтерия");
         Employee accHead = new Employee("Сидорова С.С.", Role.DEPARTMENT_HEAD);
         accounting.setHead(accHead);
@@ -164,7 +152,6 @@ public class Demo {
             acc.setDepartment(accounting);
         }
 
-        // IT отдел
         Department it = new Department("IT отдел");
         Employee itHead = new Employee("Кузнецов К.К.", Role.DEPARTMENT_HEAD);
         it.setHead(itHead);
@@ -182,7 +169,6 @@ public class Demo {
         it.addEmployee(lawyer);
         lawyer.setDepartment(it);
 
-        // Отдел разработки (вложен в IT)
         Department dev = new Department("Отдел разработки");
         Employee devHead = new Employee("Петров П.П.", Role.DEPARTMENT_HEAD);
         dev.setHead(devHead);
@@ -196,7 +182,6 @@ public class Demo {
             devEng.setDepartment(dev);
         }
 
-        // Отдел тестирования (вложен в IT)
         Department qa = new Department("Отдел тестирования");
         Employee qaHead = new Employee("Тестировщиков Т.Т.", Role.DEPARTMENT_HEAD);
         qa.setHead(qaHead);
@@ -210,7 +195,6 @@ public class Demo {
             tester.setDepartment(qa);
         }
 
-        // Отдел продаж
         Department sales = new Department("Отдел продаж");
         Employee salesHead = new Employee("Продавцов П.П.", Role.DEPARTMENT_HEAD);
         sales.setHead(salesHead);

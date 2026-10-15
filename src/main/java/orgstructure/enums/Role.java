@@ -1,5 +1,8 @@
 package orgstructure.enums;
-
+/**
+ * Роли сотрудников в организации.
+ * Перечисление с полем displayName для читаемого отображения.
+ */
 public enum Role {
     DIRECTOR("Директор"),
     DEPARTMENT_HEAD("Руководитель подразделения"),

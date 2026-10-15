@@ -52,10 +52,6 @@ public class Employee {
         this.department = department;
     }
 
-    /**
-     * Проверяет равенство сотрудников по ФИО и роли.
-     */
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -63,10 +59,6 @@ public class Employee {
         return Objects.equals(fullName, employee.fullName) && role == employee.role;
     }
 
-    /**
-     * Вычисляет хеш-код на основе ФИО и роли.
-     */
-    @Override
     public int hashCode() {
         return Objects.hash(fullName, role);
     }
