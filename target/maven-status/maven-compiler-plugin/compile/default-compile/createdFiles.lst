@@ -1,0 +1,15 @@
+orgstructure\demo\Demo.class
+orgstructure\enums\StepStatus.class
+orgstructure\enums\Role.class
+orgstructure\model\Employee.class
+orgstructure\model\Department.class
+orgstructure\service\RoleHolderResolver.class
+orgstructure\exception\ApprovalException.class
+orgstructure\model\Document.class
+orgstructure\enums\DocumentStatus.class
+orgstructure\service\DirectManagerResolver.class
+orgstructure\service\ApprovalService.class
+orgstructure\service\DepartmentHeadResolver.class
+orgstructure\enums\ApproverRule.class
+orgstructure\model\ApprovalStep.class
+orgstructure\service\ApproverResolver.class
