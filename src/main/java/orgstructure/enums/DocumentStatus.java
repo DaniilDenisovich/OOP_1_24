@@ -1,33 +1,24 @@
 package orgstructure.enums;
 
-/**
-  Статусы жизненного цикла документа.
-  Реализует конечный автомат, контролирующий допустимые переходы и операции над документом.
- */
-
 public enum DocumentStatus {
-    DRAFT("Черновик"),
-    IN_APPROVAL("На согласовании"),
-    APPROVED("Согласован"),
-    REJECTED("Отклонён");
+    DRAFT("Черновик", false),
+    IN_PROGRESS("На согласовании", false),
+    APPROVED("Согласован", true),
+    REJECTED("Отклонён", true);
 
-    private final String displayName;
+    private final String title;
+    private final boolean terminal;
 
-    DocumentStatus(String displayName) {
-        this.displayName = displayName;
+    DocumentStatus(String title, boolean terminal) {
+        this.title = title;
+        this.terminal = terminal;
     }
 
-
-    public String getDisplayName() {
-        return displayName;
+    public String getTitle() {
+        return title;
     }
 
     public boolean isTerminal() {
-        return this == APPROVED || this == REJECTED;
-    }
-
-    @Override
-    public String toString() {
-        return displayName;
+        return terminal;
     }
 }

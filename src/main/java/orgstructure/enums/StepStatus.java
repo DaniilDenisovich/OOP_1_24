@@ -1,27 +1,18 @@
 package orgstructure.enums;
 
-/**
-  Статусы шага маршрута согласования.
-  Определяют текущее состояние отдельного этапа согласования документа и итогового статуса документа.
- */
-
 public enum StepStatus {
-    PENDING("Ожидает"),
+    PENDING("Ожидает согласования"),
     APPROVED("Согласован"),
-    REJECTED("Отклонён");
+    REJECTED("Отклонён"),
+    SKIPPED("Пропущен");
 
-    private final String displayName;
+    private final String description;
 
-    StepStatus(String displayName) {
-        this.displayName = displayName;
+    StepStatus(String description) {
+        this.description = description;
     }
 
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    @Override
-    public String toString() {
-        return displayName;
+    public String getDescription() {
+        return description;
     }
 }

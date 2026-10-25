@@ -1,122 +1,69 @@
 package orgstructure.model;
 
-import orgstructure.enums.ApproverRule;
-import orgstructure.enums.Role;
 import orgstructure.enums.StepStatus;
-import java.time.LocalDate;
 
-/**
-  Шаг маршрута согласования документа.
-  Определяет, кто должен согласовать документ, текущий статус и историю.
- */
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.Objects;
+
+
 public class ApprovalStep {
-    private final ApproverRule rule;
-    private final Role requiredRole;
+
+    private final int stepNumber;
+    private final Employee approver;
+    private final Duration timeLimit;
+    private final LocalDateTime assignedAt;
     private StepStatus status;
-    private Employee approver;
-    private Employee expectedApprover;
-    private LocalDate approvalDate;
-    private final LocalDate createdDate;
 
-    /**
-      Создаёт шаг маршрута с указанным правилом выбора согласующего.
-      @param rule правило выбора согласующего
-      @param requiredRole требуемая роль
-      @throws IllegalArgumentException если rule = ROLE_HOLDER, но requiredRole = null
-     */
-    public ApprovalStep(ApproverRule rule, Role requiredRole) {
-        if (rule == null) {
-            throw new IllegalArgumentException("Правило выбора согласующего не может быть null");
+
+    public ApprovalStep(int stepNumber, Employee approver, Duration timeLimit, LocalDateTime assignedAt) {
+        if (stepNumber <= 0) {
+            throw new IllegalArgumentException("Номер шага должен быть положительным числом: " + stepNumber);
         }
-        if (rule == ApproverRule.ROLE_HOLDER && requiredRole == null) {
-            throw new IllegalArgumentException("Для правила ROLE_HOLDER должна быть указана требуемая роль");
-        }
-        this.rule = rule;
-        this.requiredRole = requiredRole;
+        this.stepNumber = stepNumber;
+        this.approver = Objects.requireNonNull(approver, "Согласующий не может быть null");
+        this.timeLimit = Objects.requireNonNull(timeLimit, "Лимит времени не может быть null");
+        this.assignedAt = Objects.requireNonNull(assignedAt, "Время назначения не может быть null");
         this.status = StepStatus.PENDING;
-        this.createdDate = LocalDate.now();
     }
 
-    /** @return правило выбора согласующего */
-    public ApproverRule getRule() {
-        return rule;
+    public int getStepNumber() {
+        return stepNumber;
     }
 
-    /** @return требуемая роль или null */
-    public Role getRequiredRole() {
-        return requiredRole;
-    }
-
-    /** @return текущий статус шага */
-    public StepStatus getStatus() {
-        return status;
-    }
-
-    /** @return согласующий или null, если шаг ещё не завершён */
     public Employee getApprover() {
         return approver;
     }
 
-    /** @return ожидаемый согласующий или null */
-    public Employee getExpectedApprover() {
-        return expectedApprover;
+    public Duration getTimeLimit() {
+        return timeLimit;
     }
 
-    /**
-      Устанавливает ожидаемого согласующего.
-      @param expectedApprover сотрудник, который должен согласовать
-     */
-    public void setExpectedApprover(Employee expectedApprover) {
-        this.expectedApprover = expectedApprover;
+    public LocalDateTime getAssignedAt() {
+        return assignedAt;
     }
 
-    /**
-      Согласует шаг указанным сотрудником.
-      @param employee сотрудник, который согласует
-      @throws IllegalStateException если шаг уже завершён
-     */
-    public void approve(Employee employee) {
-        if (status != StepStatus.PENDING) {
-            throw new IllegalStateException("Нельзя согласовать шаг со статусом " + status);
-        }
-        this.approver = employee;
-        this.approvalDate = LocalDate.now();
-        this.status = StepStatus.APPROVED;
+    public StepStatus getStatus() {
+        return status;
     }
 
-    /**
-      Отклоняет шаг указанным сотрудником.
-      @param employee сотрудник, который отклоняет
-      @throws IllegalStateException если шаг уже завершён
-     */
-    public void reject(Employee employee) {
-        if (status != StepStatus.PENDING) {
-            throw new IllegalStateException("Нельзя отклонить шаг со статусом " + status);
-        }
-        this.approver = employee;
-        this.approvalDate = LocalDate.now();
-        this.status = StepStatus.REJECTED;
+
+    public LocalDateTime getDeadline() {
+        return assignedAt.plus(timeLimit);
     }
 
-    /**
-      Проверяет, завершён ли шаг.
-      @return true, если шаг завершён
-     */
-    public boolean isCompleted() {
-        return status == StepStatus.APPROVED || status == StepStatus.REJECTED;
+
+    public boolean isOverdue(LocalDateTime now) {
+        return now.isAfter(getDeadline());
+    }
+
+    public void setStatus(StepStatus status) {
+        this.status = Objects.requireNonNull(status, "Статус не может быть null");
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(rule.getDisplayName());
-        if (requiredRole != null) {
-            sb.append(" (").append(requiredRole.getDisplayName()).append(")");
-        }
-        sb.append(" — ").append(status.getDisplayName());
-        if (approver != null) {
-            sb.append(" [").append(approver.getFullName()).append(", ").append(approvalDate).append("]");
-        }
-        return sb.toString();
+        return "Шаг #" + stepNumber + " [" + status.getDescription() + "] -> " + approver.getFullName()
+                + " (дедлайн: " + getDeadline() + ")";
     }
 }

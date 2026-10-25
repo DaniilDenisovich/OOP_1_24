@@ -1,137 +1,105 @@
 package orgstructure.model;
 
 import orgstructure.enums.DocumentStatus;
-import java.time.LocalDate;
+import orgstructure.enums.StepStatus;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
-/**
-  Документ, проходящий процедуру согласования.
-  Содержит маршрут согласования из шагов и историю изменений статуса.
- */
+
 public class Document {
-    private final String title;
-    private DocumentStatus status;
-    private final List<ApprovalStep> steps;
-    private final List<String> history;
-    private final LocalDate createdDate;
 
-    /**
-      Создаёт документ с указанным названием в статусе черновика.
-      @param title название документа
-      @throws IllegalArgumentException если title null или пустой
-     */
-    public Document(String title) {
-        if (title == null || title.isBlank()) {
-            throw new IllegalArgumentException("Название документа не может быть пустым");
-        }
-        this.title = title;
+    private final String id;
+    private final String title;
+    private final Employee author;
+    private final LocalDateTime createdAt;
+
+    private DocumentStatus status;
+    private final List<ApprovalStep> route = new ArrayList<>();
+    private final List<ApprovalRecord> history = new ArrayList<>();
+
+    public Document(String id, String title, Employee author, LocalDateTime createdAt) {
+        this.id = Objects.requireNonNull(id, "ID документа не может быть null");
+        this.title = Objects.requireNonNull(title, "Название документа не может быть null");
+        this.author = Objects.requireNonNull(author, "Автор документа не может быть null");
+        this.createdAt = Objects.requireNonNull(createdAt, "Дата создания не может быть null");
         this.status = DocumentStatus.DRAFT;
-        this.steps = new ArrayList<>();
-        this.history = new ArrayList<>();
-        this.createdDate = LocalDate.now();
-        addHistory("Документ создан");
     }
 
-    /** @return название документа */
+    public String getId() {
+        return id;
+    }
+
     public String getTitle() {
         return title;
     }
 
-    /** @return текущий статус документа */
+    public Employee getAuthor() {
+        return author;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
     public DocumentStatus getStatus() {
         return status;
     }
 
-    /**
-      Возвращает список шагов маршрута согласования.
-      @return неизменяемая копия списка для сохранения инкапсуляции
-     */
-    public List<ApprovalStep> getSteps() {
-        return Collections.unmodifiableList(steps);
+    public void setStatus(DocumentStatus status) {
+        this.status = Objects.requireNonNull(status, "Статус документа не может быть null");
     }
 
-    /**
-      Возвращает историю изменений документа.
-      @return неизменяемая копия списка записей истории
-     */
-    public List<String> getHistory() {
+
+    public void setRoute(List<ApprovalStep> steps) {
+        Objects.requireNonNull(steps, "Список шагов не может быть null");
+        if (this.status != DocumentStatus.DRAFT) {
+            throw new IllegalStateException("Нельзя менять маршрут документа после запуска согласования");
+        }
+        this.route.clear();
+        this.route.addAll(steps);
+    }
+
+
+    public List<ApprovalStep> getRoute() {
+        return Collections.unmodifiableList(route);
+    }
+
+
+    public List<ApprovalRecord> getHistory() {
         return Collections.unmodifiableList(history);
     }
 
-    /**
-      Добавляет шаг в маршрут согласования.
-      @param step шаг для добавления
-      @throws IllegalStateException если документ не в статусе DRAFT
-     */
-    public void addStep(ApprovalStep step) {
-        if (status != DocumentStatus.DRAFT) {
-            throw new IllegalStateException("Нельзя добавлять шаги к документу в статусе " + status);
-        }
-        steps.add(step);
+
+    public void addHistoryRecord(ApprovalRecord record) {
+        this.history.add(Objects.requireNonNull(record, "Запись истории не может быть null"));
     }
 
-    /**
-      Запускает процесс согласования.
-      @throws IllegalStateException если документ не в статусе DRAFT или нет шагов
-     */
-    public void startApproval() {
-        if (status != DocumentStatus.DRAFT) {
-            throw new IllegalStateException("Нельзя начать согласование для документа в статусе " + status);
-        }
-        if (steps.isEmpty()) {
-            throw new IllegalStateException("Нельзя начать согласование без шагов маршрута");
-        }
-        status = DocumentStatus.IN_APPROVAL;
-        addHistory("Начато согласование");
+
+    public Optional<ApprovalStep> getCurrentStep() {
+        return route.stream()
+                .filter(step -> step.getStatus() == StepStatus.PENDING)
+                .findFirst();
     }
 
-    /**
-      Возвращает текущий шаг, ожидающий согласования.
-      @return текущий шаг или null, если все шаги завершены
-     */
-    public ApprovalStep getCurrentStep() {
-        for (ApprovalStep step : steps) {
-            if (step.getStatus() == orgstructure.enums.StepStatus.PENDING) {
-                return step;
-            }
-        }
-        return null;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Document document)) return false;
+        return Objects.equals(id, document.id);
     }
 
-    /**
-      Обновляет статус документа на основе завершения шагов.
-     */
-    public void updateStatus() {
-        boolean allApproved = true;
-        boolean anyRejected = false;
-
-        for (ApprovalStep step : steps) {
-            if (step.getStatus() == orgstructure.enums.StepStatus.REJECTED) {
-                anyRejected = true;
-                break;
-            }
-            if (step.getStatus() != orgstructure.enums.StepStatus.APPROVED) {
-                allApproved = false;
-            }
-        }
-
-        if (anyRejected) {
-            status = DocumentStatus.REJECTED;
-            addHistory("Документ отклонён");
-        } else if (allApproved) {
-            status = DocumentStatus.APPROVED;
-            addHistory("Документ согласован");
-        }
-    }
-
-    private void addHistory(String message) {
-        history.add(LocalDate.now() + ": " + message);
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
     }
 
     @Override
     public String toString() {
-        return title + " [" + status.getDisplayName() + "]";
+        return "Документ #" + id + " \"" + title + "\" [" + status.getTitle() + "] от " + author.getFullName();
     }
 }

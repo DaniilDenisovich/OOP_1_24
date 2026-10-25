@@ -1,9 +1,6 @@
 package orgstructure.demo;
 
-import orgstructure.enums.ApproverRule;
-import orgstructure.enums.DocumentStatus;
 import orgstructure.enums.Role;
-import orgstructure.enums.StepStatus;
 import orgstructure.exception.ApprovalException;
 import orgstructure.model.ApprovalStep;
 import orgstructure.model.Department;

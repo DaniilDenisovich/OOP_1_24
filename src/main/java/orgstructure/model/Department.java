@@ -4,179 +4,121 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
-/**
-  Подразделение организации.
-  Формирует дерево: каждое подразделение может иметь дочерние подразделения и ссылку на родительское.
- */
 public class Department {
-    private final String name;
-    private Employee head;
-    private final List<Employee> employees;
-    private final List<Department> children;
-    private Department parent;
 
-    /**
-      Создаёт подразделение с указанным названием.
-      @param name название подразделения
-      @throws IllegalArgumentException если name null или пустой
-     */
-    public Department(String name) {
-        if (name == null || name.isBlank()) {
-            throw new IllegalArgumentException("Название подразделения не может быть пустым");
-        }
-        this.name = name;
-        this.employees = new ArrayList<>();
-        this.children = new ArrayList<>();
+    private final String id;
+    private final String name;
+    private Department parent;
+    private Employee head;
+
+    private final List<Department> subDepartments = new ArrayList<>();
+    private final List<Employee> employees = new ArrayList<>();
+
+    public Department(String id, String name) {
+        this.id = Objects.requireNonNull(id, "ID подразделения не может быть null");
+        this.name = Objects.requireNonNull(name, "Название подразделения не может быть null");
     }
 
-    /** @return название подразделения */
+    public String getId() {
+        return id;
+    }
+
     public String getName() {
         return name;
     }
 
-    /** @return руководитель или null, если не назначен */
-    public Employee getHead() {
-        return head;
-    }
-
-    /**
-      Назначает руководителя подразделения.
-      @param head сотрудник, который становится руководителем
-     */
-    public void setHead(Employee head) {
-        this.head = head;
-    }
-
-    /**
-      Возвращает список сотрудников подразделения.
-      @return неизменяемая копия списка для сохранения инкапсуляции
-     */
-    public List<Employee> getEmployees() {
-        return Collections.unmodifiableList(employees);
-    }
-
-    /**
-      Добавляет сотрудника в подразделение.
-      @param employee сотрудник для добавления
-     */
-    public void addEmployee(Employee employee) {
-        employees.add(employee);
-    }
-
-    /**
-      Возвращает список дочерних подразделений.
-      @return неизменяемая копия списка для сохранения инкапсуляции
-     */
-    public List<Department> getChildren() {
-        return Collections.unmodifiableList(children);
-    }
-
-    /**
-      Добавляет дочернее подразделение и автоматически устанавливает ссылку на родителя.
-      @param child дочернее подразделение
-     */
-    public void addChild(Department child) {
-        children.add(child);
-        child.parent = this;
-    }
-
-    /** @return родительское подразделение или null для корневого */
     public Department getParent() {
         return parent;
     }
 
-    /**
-      Обходит дерево подразделений в глубину и собирает все подразделения.
-      @return список всех подразделений в дереве
-     */
-    public List<Department> getAllDepartments() {
-        List<Department> result = new ArrayList<>();
-        collectDepartments(this, result);
-        return result;
+    private void setParent(Department parent) {
+        this.parent = parent;
     }
 
-    /**
-      Рекурсивно обходит дерево подразделений в глубину и собирает все подразделения в список.
-      @param dept текущее подразделение для обработки
-      @param result список, в который добавляются найденные подразделения
-     */
+    public Employee getHead() {
+        return head;
+    }
 
-    private void collectDepartments(Department dept, List<Department> result) {
-        result.add(dept);
-        for (Department child : dept.children) {
-            collectDepartments(child, result);
+    public void setHead(Employee head) {
+        this.head = head;
+        if (head != null && !employees.contains(head)) {
+            addEmployee(head);
         }
     }
 
-    /**
-      Находит руководителя на N уровней вверх от текущего подразделения.
-      @param levelsUp количество уровней для подъёма (1 = непосредственный руководитель)
-      @return руководитель или null, если достигли корня и выше нет
-      @throws IllegalArgumentException если levelsUp <= 0
-     */
-    public Employee findManagerNLevelsUp(int levelsUp) {
-        if (levelsUp <= 0) {
-            throw new IllegalArgumentException("levelsUp должен быть больше 0, передано: " + levelsUp);
+
+    public void addSubDepartment(Department subDepartment) {
+        Objects.requireNonNull(subDepartment, "Дочернее подразделение не может быть null");
+        if (!subDepartments.contains(subDepartment)) {
+            subDepartments.add(subDepartment);
+            subDepartment.setParent(this);
         }
+    }
+
+
+    public void addEmployee(Employee employee) {
+        Objects.requireNonNull(employee, "Сотрудник не может быть null");
+        if (!employees.contains(employee)) {
+            employees.add(employee);
+            employee.setDepartment(this);
+        }
+    }
+
+    public List<Department> getSubDepartments() {
+        return Collections.unmodifiableList(subDepartments);
+    }
+
+
+    public List<Employee> getEmployees() {
+        return Collections.unmodifiableList(employees);
+    }
+
+
+    public Optional<Employee> findManagerLevelsUp(int levelsUp) {
+        if (levelsUp < 0) {
+            throw new IllegalArgumentException("Число уровней вверх не может быть отрицательным: " + levelsUp);
+        }
+
         Department current = this;
         for (int i = 0; i < levelsUp; i++) {
-            if (current.parent == null) {
-                return null;
+            if (current.getParent() == null) {
+                return Optional.empty(); // Достигли вершины дерева раньше, чем поднялись на N уровней
             }
-            current = current.parent;
+            current = current.getParent();
         }
-        return current.head;
+
+        return Optional.ofNullable(current.getHead());
     }
 
-    /**
-      Собирает всех подчинённых вглубь дерева.
-      @return список всех сотрудников во всех дочерних подразделениях
-     */
-    public List<Employee> getAllSubordinates() {
-        List<Employee> result = new ArrayList<>();
-        collectSubordinates(this, result);
-        return result;
+    public List<Employee> getAllSubordinatesDeep() {
+        List<Employee> allEmployees = new ArrayList<>();
+        collectEmployeesRecursive(this, allEmployees);
+        return Collections.unmodifiableList(allEmployees);
     }
 
-    /**
-      Рекурсивно обходит дочерние подразделения и собирает всех их сотрудников в список.
-      Включает руководителей дочерних подразделений и рядовых сотрудников.
-      @param dept текущее подразделение, чьих подчинённых нужно собрать
-      @param result список, в который добавляются найденные сотрудники
-     */
-
-    private void collectSubordinates(Department dept, List<Employee> result) {
-        for (Department child : dept.children) {
-            if (child.head != null) {
-                result.add(child.head);
-            }
-            result.addAll(child.employees);
-            collectSubordinates(child, result);
+    private void collectEmployeesRecursive(Department current, List<Employee> accumulator) {
+        accumulator.addAll(current.employees);
+        for (Department child : current.subDepartments) {
+            collectEmployeesRecursive(child, accumulator);
         }
     }
 
-    /**
-      Проверяет равенство подразделений по названию.
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Department that = (Department) o;
-        return Objects.equals(name, that.name);
+        if (!(o instanceof Department that)) return false;
+        return Objects.equals(id, that.id);
     }
 
-    /**
-      Вычисляет хеш-код на основе названия.
-     */
     @Override
     public int hashCode() {
-        return Objects.hash(name);
+        return Objects.hashCode(id);
     }
 
     @Override
     public String toString() {
-        return name + (head != null ? " [рук: " + head.getFullName() + "]" : "");
+        return "Отдел: " + name + " (ID: " + id + ")";
     }
 }
