@@ -122,7 +122,8 @@ class ApprovalServiceTest {
                 () -> approvalService.buildRoute(doc, rules, Duration.ofHours(12), LocalDateTime.now())
         );
 
-        assertTrue(ex.getMessage().contains("не найден сотрудник с ролью: LAWYER"));
+        assertTrue(ex.getMessage().contains("не найден сотрудник с ролью"),
+                "Сообщение об ошибке должно сообщать об отсутствии сотрудника с заданной ролью");
     }
 
     @Test

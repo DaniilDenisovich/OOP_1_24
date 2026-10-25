@@ -1,28 +1,31 @@
 package orgstructure.enums;
+
 /**
-  Роли сотрудников в организации.
-  Перечисление с полем displayName для читаемого отображения.
+ * Роли сотрудников в организации.
+ * Перечисление с полями для наглядного отображения должности.
  */
 public enum Role {
-    DIRECTOR("Директор"),
-    DEPARTMENT_HEAD("Руководитель подразделения"),
+    DIRECTOR("Генеральный директор"),
+    DEPARTMENT_HEAD("Руководитель департамента"),
+    TEAM_LEAD("Руководитель группы / Тимлид"),
+    DEVELOPER("Разработчик"),
     ACCOUNTANT("Бухгалтер"),
     LAWYER("Юрист"),
-    ENGINEER("Инженер"),
-    MANAGER("Менеджер");
+    HR("Специалист по кадрам"),
+    EMPLOYEE("Сотрудник");
 
-    private final String displayName;
+    private final String title;
 
-    Role(String displayName) {
-        this.displayName = displayName;
+    Role(String title) {
+        this.title = title;
     }
 
-    public String getDisplayName() {
-        return displayName;
+    public String getTitle() {
+        return title;
     }
 
     @Override
     public String toString() {
-        return displayName;
+        return title;
     }
 }

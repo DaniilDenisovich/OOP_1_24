@@ -1,8 +1,10 @@
 orgstructure\service\RoleHolderRule.class
+orgstructure\demo\Demo.class
 orgstructure\enums\StepStatus.class
 orgstructure\enums\Role.class
 orgstructure\model\Employee.class
 orgstructure\model\ApprovalRecord.class
+orgstructure\exception\UnauthorizedApproverException.class
 orgstructure\model\Department.class
 orgstructure\exception\ApprovalException.class
 orgstructure\model\Document.class
@@ -11,4 +13,4 @@ orgstructure\service\ApprovalService.class
 orgstructure\service\DirectManagerRule.class
 orgstructure\service\ApproverRule.class
 orgstructure\model\ApprovalStep.class
-orgstructure\service\ApproverResolver.class
+orgstructure\service\DepartmentHeadRule.class
