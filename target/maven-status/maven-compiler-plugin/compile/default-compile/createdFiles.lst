@@ -1,4 +1,3 @@
-orgstructure\service\RoleHolderRule.class
 orgstructure\demo\Demo.class
 orgstructure\enums\StepStatus.class
 orgstructure\enums\Role.class
@@ -10,7 +9,5 @@ orgstructure\exception\ApprovalException.class
 orgstructure\model\Document.class
 orgstructure\enums\DocumentStatus.class
 orgstructure\service\ApprovalService.class
-orgstructure\service\DirectManagerRule.class
 orgstructure\service\ApproverRule.class
 orgstructure\model\ApprovalStep.class
-orgstructure\service\DepartmentHeadRule.class
