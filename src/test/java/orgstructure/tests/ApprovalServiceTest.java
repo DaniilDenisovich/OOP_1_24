@@ -9,7 +9,6 @@ import orgstructure.model.ApprovalStep;
 import orgstructure.model.Department;
 import orgstructure.model.Document;
 import orgstructure.model.Employee;
-import orgstructure.service.ApprovalService;
 import orgstructure.service.ApproverRule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,7 +29,6 @@ class ApprovalServiceTest {
     private Employee lead;
     private Employee director;
     private Employee accountant;
-    private ApprovalService approvalService;
 
     @BeforeEach
     void setUp() {
@@ -47,8 +45,6 @@ class ApprovalServiceTest {
         devDept.addEmployee(author);
 
         company.addSubDepartment(devDept);
-
-        approvalService = new ApprovalService(company);
     }
 
     @Test
@@ -63,18 +59,18 @@ class ApprovalServiceTest {
         );
 
         LocalDateTime now = LocalDateTime.now();
-        approvalService.buildRoute(doc, rules, Duration.ofHours(24), now);
+        doc.buildRoute(rules, company, Duration.ofHours(24), now);
 
         assertEquals(DocumentStatus.IN_PROGRESS, doc.getStatus());
         assertEquals(3, doc.getRoute().size());
 
-        approvalService.approve(doc, lead, "Согласовано тимлидом", now.plusHours(1));
+        doc.approve(lead, "Согласовано тимлидом", now.plusHours(1));
         assertEquals(StepStatus.APPROVED, doc.getRoute().get(0).getStatus());
 
-        approvalService.approve(doc, accountant, "Отпускные рассчитаны", now.plusHours(2));
+        doc.approve(accountant, "Отпускные рассчитаны", now.plusHours(2));
         assertEquals(StepStatus.APPROVED, doc.getRoute().get(1).getStatus());
 
-        approvalService.approve(doc, director, "Утверждаю", now.plusHours(3));
+        doc.approve(director, "Утверждаю", now.plusHours(3));
         assertEquals(StepStatus.APPROVED, doc.getRoute().get(2).getStatus());
 
         assertEquals(DocumentStatus.APPROVED, doc.getStatus());
@@ -86,9 +82,9 @@ class ApprovalServiceTest {
     @DisplayName("Отклонение документа на первом шаге завершает маршрут со статусом REJECTED")
     void testRejectOnFirstStep() throws ApprovalException {
         Document doc = new Document("DOC-102", "Закупка оборудования", author, LocalDateTime.now());
-        approvalService.buildRoute(doc, List.of(ApproverRule.directManager()), Duration.ofHours(48), LocalDateTime.now());
+        doc.buildRoute(List.of(ApproverRule.directManager()), company, Duration.ofHours(48), LocalDateTime.now());
 
-        approvalService.reject(doc, lead, "Бюджет на текущий квартал исчерпан", LocalDateTime.now());
+        doc.reject(lead, "Бюджет на текущий квартал исчерпан", LocalDateTime.now());
 
         assertEquals(DocumentStatus.REJECTED, doc.getStatus());
         assertEquals(StepStatus.REJECTED, doc.getRoute().get(0).getStatus());
@@ -99,11 +95,11 @@ class ApprovalServiceTest {
     @DisplayName("Выброс непроверяемого UnauthorizedApproverException при согласовании чужого шага")
     void testUnauthorizedApproverThrowsException() throws ApprovalException {
         Document doc = new Document("DOC-103", "Премия", author, LocalDateTime.now());
-        approvalService.buildRoute(doc, List.of(ApproverRule.directManager()), Duration.ofHours(24), LocalDateTime.now());
+        doc.buildRoute(List.of(ApproverRule.directManager()), company, Duration.ofHours(24), LocalDateTime.now());
 
         UnauthorizedApproverException ex = assertThrows(
                 UnauthorizedApproverException.class,
-                () -> approvalService.approve(doc, director, "Я директор, согласую за всех", LocalDateTime.now())
+                () -> doc.approve(director, "Я директор, согласую за всех", LocalDateTime.now())
         );
 
         assertTrue(ex.getMessage().contains("не имеет права согласовывать шаг"));
@@ -118,7 +114,7 @@ class ApprovalServiceTest {
 
         ApprovalException ex = assertThrows(
                 ApprovalException.class,
-                () -> approvalService.buildRoute(doc, rules, Duration.ofHours(12), LocalDateTime.now())
+                () -> doc.buildRoute(rules, company, Duration.ofHours(12), LocalDateTime.now())
         );
 
         assertTrue(ex.getMessage().contains("не найден сотрудник с ролью"));
@@ -132,7 +128,7 @@ class ApprovalServiceTest {
 
         ApprovalException ex = assertThrows(
                 ApprovalException.class,
-                () -> approvalService.buildRoute(doc, rules, Duration.ofHours(12), LocalDateTime.now())
+                () -> doc.buildRoute(rules, company, Duration.ofHours(12), LocalDateTime.now())
         );
 
         assertTrue(ex.getMessage().contains("нет вышестоящего руководителя"));
@@ -144,7 +140,7 @@ class ApprovalServiceTest {
         Document doc = new Document("DOC-106", "Записка", author, LocalDateTime.now());
 
         assertThrows(ApprovalException.class,
-                () -> approvalService.buildRoute(doc, List.of(), Duration.ofHours(1), LocalDateTime.now()));
+                () -> doc.buildRoute(List.of(), company, Duration.ofHours(1), LocalDateTime.now()));
     }
 
     @Test
@@ -164,7 +160,7 @@ class ApprovalServiceTest {
     @DisplayName("Запрет на изменение маршрута у документа не в статусе DRAFT")
     void testCannotChangeRouteWhenNotInDraft() throws ApprovalException {
         Document doc = new Document("DOC-107", "Отчет", author, LocalDateTime.now());
-        approvalService.buildRoute(doc, List.of(ApproverRule.directManager()), Duration.ofHours(2), LocalDateTime.now());
+        doc.buildRoute(List.of(ApproverRule.directManager()), company, Duration.ofHours(2), LocalDateTime.now());
 
         assertThrows(IllegalStateException.class, () -> doc.setRoute(List.of()));
     }
