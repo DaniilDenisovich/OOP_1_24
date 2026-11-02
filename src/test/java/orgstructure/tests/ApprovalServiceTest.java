@@ -33,7 +33,7 @@ class ApprovalServiceTest {
     @BeforeEach
     void setUp() {
         company = new Department("ROOT", "Главная Компания");
-        director = new Employee("DIR-01", "Ольга Директорова", Role.DIRECTOR);
+        director = new Employee("DIR-01", "Ольга Директор", Role.DIRECTOR);
         accountant = new Employee("ACC-01", "Мария Бухгалтер", Role.ACCOUNTANT);
         company.setHead(director);
         company.addEmployee(accountant);

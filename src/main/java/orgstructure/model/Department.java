@@ -84,7 +84,7 @@ public class Department {
         Department current = this;
         for (int i = 0; i < levelsUp; i++) {
             if (current.getParent() == null) {
-                return Optional.empty(); // Достигли вершины дерева раньше, чем поднялись на N уровней
+                return Optional.empty();
             }
             current = current.getParent();
         }
@@ -121,24 +121,18 @@ public class Department {
     public String toString() {
         return "Отдел: " + name + " (ID: " + id + ")";
     }
-    /**
-     * Выводит в консоль наглядное дерево подразделения с вложенными отделами,
-     * руководителем и штатом сотрудников.
-     *
-     * @param indent текущий отступ для формирования древовидной графики
-     */
+
+
     public void printHierarchy(String indent) {
         String headInfo = (head != null) ? " [Руководитель: " + head.getFullName() + "]" : " [Без руководителя]";
         System.out.println(indent + "└── 📁 " + name + " (ID: " + id + ")" + headInfo);
 
-        // Печатаем сотрудников текущего отдела
         for (Employee emp : employees) {
             boolean isHead = emp.equals(head);
             System.out.println(indent + "    ├── 👤 " + emp.getFullName() + " — " + emp.getRole().getTitle()
                     + (isHead ? " ★ (Руководитель)" : ""));
         }
 
-        // Рекурсивно спускаемся во все дочерние отделы
         for (Department sub : subDepartments) {
             sub.printHierarchy(indent + "    ");
         }

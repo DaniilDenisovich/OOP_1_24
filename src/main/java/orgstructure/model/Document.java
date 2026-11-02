@@ -14,11 +14,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-/**
- * Документ, проходящий маршрут согласования.
- * Хранит автора, статус, маршрут из шагов, историю действий
- * и управляет своим жизненным циклом (построение маршрута, согласование, отклонение).
- */
 public class Document {
 
     private final String id;
@@ -62,10 +57,6 @@ public class Document {
         this.status = Objects.requireNonNull(status, "Статус документа не может быть null");
     }
 
-    /**
-     * Устанавливает маршрут согласования для документа.
-     * Защита инварианта: маршрут задается только пока документ в статусе DRAFT.
-     */
     public void setRoute(List<ApprovalStep> steps) {
         Objects.requireNonNull(steps, "Список шагов не может быть null");
         if (this.status != DocumentStatus.DRAFT) {
@@ -93,19 +84,6 @@ public class Document {
                 .findFirst();
     }
 
-    // =========================================================================
-    // БИЗНЕС-ОПЕРАЦИИ ЖИЗНЕННОГО ЦИКЛА ДОКУМЕНТА
-    // =========================================================================
-
-    /**
-     * Формирует маршрут согласования документа на основе переданных правил.
-     *
-     * @param rules        последовательность правил выбора согласующих
-     * @param organization корневая организация для поиска сотрудников
-     * @param timeLimit    лимит времени на каждый шаг
-     * @param now          момент времени запуска маршрута
-     * @throws ApprovalException если согласующий не может быть найден или список правил пуст
-     */
     public void buildRoute(List<ApproverRule> rules, Department organization, Duration timeLimit, LocalDateTime now)
             throws ApprovalException {
         Objects.requireNonNull(rules, "Список правил не может быть null");
@@ -126,14 +104,6 @@ public class Document {
         this.status = DocumentStatus.IN_PROGRESS;
     }
 
-    /**
-     * Согласование текущего шага.
-     *
-     * @param actor   сотрудник, выполняющий согласование
-     * @param comment комментарий
-     * @param now     момент времени согласования
-     * @throws UnauthorizedApproverException если сотрудник не имеет права согласовывать данный шаг
-     */
     public void approve(Employee actor, String comment, LocalDateTime now) {
         validateInProgress();
 
@@ -154,14 +124,6 @@ public class Document {
         }
     }
 
-    /**
-     * Отклонение документа на текущем шаге.
-     *
-     * @param actor  сотрудник, отклоняющий документ
-     * @param reason причина отклонения
-     * @param now    момент времени отклонения
-     * @throws UnauthorizedApproverException если сотрудник не имеет права отклонять данный шаг
-     */
     public void reject(Employee actor, String reason, LocalDateTime now) {
         validateInProgress();
 

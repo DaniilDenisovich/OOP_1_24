@@ -15,26 +15,20 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Консольная демонстрация всех базовых операций оргструктуры и согласования документов.
- */
+
 public class Demo {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
     public static void main(String[] args) {
         System.out.println("==========================================================================");
-        System.out.println("   ДЕМОНСТРАЦИЯ: ОРГСТРУКТУРА И СОГЛАСОВАНИЕ ДОКУМЕНТОВ (ВАРИАНТ 24)");
+        System.out.println(" ДЕМОНСТРАЦИЯ: ОРГСТРУКТУРА И СОГЛАСОВАНИЕ ДОКУМЕНТОВ ");
         System.out.println("==========================================================================\n");
 
         List<Object> allCreatedObjects = new ArrayList<>();
 
-        // ---------------------------------------------------------------------
-        // 1. ИНИЦИАЛИЗАЦИЯ ОРГСТРУКТУРЫ
-        // ---------------------------------------------------------------------
         System.out.println(">>> 1. Инициализация и построение иерархии подразделений предприятия...");
 
-        // Корень
         Department rootCompany = new Department("DEP-01", "ПАО 'ТехноХолдинг'");
         Employee ceo = new Employee("EMP-001", "Виктор Семенович Орлов", Role.DIRECTOR);
         rootCompany.setHead(ceo);
@@ -46,13 +40,11 @@ public class Demo {
         rootCompany.addEmployee(accountant);
         rootCompany.addEmployee(hrLead);
 
-        // Департамент IT
         Department itDept = new Department("DEP-02", "Департамент информационных технологий");
         Employee cto = new Employee("EMP-005", "Борис Игоревич Морозов", Role.DEPARTMENT_HEAD);
         itDept.setHead(cto);
         rootCompany.addSubDepartment(itDept);
 
-        // Отдел разработки (в составе IT)
         Department devDept = new Department("DEP-03", "Отдел программной разработки");
         Employee devLead = new Employee("EMP-006", "Сергей Алексеевич Петров", Role.TEAM_LEAD);
         devDept.setHead(devLead);
@@ -65,7 +57,6 @@ public class Demo {
         devDept.addEmployee(dev2);
         devDept.addEmployee(dev3);
 
-        // Отдел QA (в составе IT)
         Department qaDept = new Department("DEP-04", "Отдел обеспечения качества");
         Employee qaLead = new Employee("EMP-010", "Ольга Николаевна Федорова", Role.TEAM_LEAD);
         qaDept.setHead(qaLead);
@@ -76,7 +67,6 @@ public class Demo {
         qaDept.addEmployee(qa1);
         qaDept.addEmployee(qa2);
 
-        // Департамент продаж
         Department salesDept = new Department("DEP-05", "Департамент корпоративных продаж");
         Employee salesDirector = new Employee("EMP-013", "Григорий Романович Волков", Role.DEPARTMENT_HEAD);
         salesDept.setHead(salesDirector);
@@ -91,13 +81,11 @@ public class Demo {
         allCreatedObjects.addAll(List.of(ceo, legalHead, accountant, hrLead, cto, devLead,
                 dev1, dev2, dev3, qaLead, qa1, qa2, salesDirector, sales1, sales2));
 
-        // НАГЛЯДНЫЙ ВЫВОД ДЕРЕВА ОРГСТРУКТУРЫ
         System.out.println("\n--- Иерархическое дерево компании (Оргструктура) ---");
         rootCompany.printHierarchy("");
 
-        // ---------------------------------------------------------------------
-        // 2. ДЕМОНСТРАЦИЯ ОБХОДОВ ДЕРЕВА
-        // ---------------------------------------------------------------------
+
+
         System.out.println("\n>>> 2. Демонстрация алгоритмов обхода дерева подразделений:");
 
         System.out.println("2.1. Поиск руководителей на N уровней вверх для '" + devDept.getName() + "':");
@@ -118,9 +106,8 @@ public class Demo {
                     (emp.getDepartment() != null ? emp.getDepartment().getName() : "-"));
         }
 
-        // ---------------------------------------------------------------------
-        // 3. УСПЕШНОЕ СОГЛАСОВАНИЕ ДОКУМЕНТА
-        // ---------------------------------------------------------------------
+
+
         System.out.println("\n>>> 3. Сценарий: построение маршрута и полное согласование документа");
         LocalDateTime startTime = LocalDateTime.of(2026, 10, 25, 10, 0);
         Document doc1 = new Document("DOC-2026-001", "Заявка на расширение серверов", dev1, startTime);
@@ -141,17 +128,14 @@ public class Demo {
             System.out.println("Сформирован маршрут шагов (лимит на шаг: 24 часа):");
             doc1.getRoute().forEach(step -> System.out.println("   " + step));
 
-            // Шаг 1
             LocalDateTime t1 = startTime.plusHours(2);
             System.out.println("\n[Шаг 1] " + devLead.getFullName() + " рассматривает заявку...");
             doc1.approve(devLead, "Согласовано тимлидом, мощности требуются", t1);
 
-            // Шаг 2
             LocalDateTime t2 = t1.plusHours(4);
             System.out.println("[Шаг 2] " + legalHead.getFullName() + " проводит экспертизу...");
             doc1.approve(legalHead, "Юридических рисков в контракте нет", t2);
 
-            // Шаг 3
             LocalDateTime t3 = t2.plusHours(5);
             System.out.println("[Шаг 3] " + ceo.getFullName() + " утверждает итоговый бюджет...");
             doc1.approve(ceo, "Утверждаю закупку оборудования", t3);
@@ -172,9 +156,8 @@ public class Demo {
             System.err.println("Ошибка маршрутизации: " + e.getMessage());
         }
 
-        // ---------------------------------------------------------------------
-        // 4. ОТКЛОНЕНИЕ ДОКУМЕНТА
-        // ---------------------------------------------------------------------
+
+
         System.out.println("\n>>> 4. Сценарий: отклонение заявки на командировку");
         Document doc2 = new Document("DOC-2026-002", "Заявка на конференцию", dev2, startTime);
         allCreatedObjects.add(doc2);
@@ -196,12 +179,12 @@ public class Demo {
             System.err.println("Ошибка: " + e.getMessage());
         }
 
-        // ---------------------------------------------------------------------
-        // 5. ДЕМОНСТРАЦИЯ ИСКЛЮЧЕНИЙ ОБОИХ ВИДОВ
-        // ---------------------------------------------------------------------
+
+
+
         System.out.println("\n>>> 5. Демонстрация обработки исключений обоих видов (Checked и Unchecked):");
 
-        // 5.1. Непроверяемое исключение (попытка согласовать чужой шаг)
+
         System.out.println("\n5.1. Попытка согласовать чужой шаг (UnauthorizedApproverException - Unchecked):");
         Document doc3 = new Document("DOC-2026-003", "Заявка на премию", qa1, startTime);
         allCreatedObjects.add(doc3);
@@ -220,7 +203,8 @@ public class Demo {
             System.err.println("Неожиданная ошибка: " + e.getMessage());
         }
 
-        // 5.2. Проверяемое исключение (невозможно построить маршрут)
+
+
         System.out.println("\n5.2. Невозможность построить маршрут выше корня (ApprovalException - Checked):");
         Document doc4 = new Document("DOC-2026-004", "Устав компании", ceo, startTime);
         allCreatedObjects.add(doc4);
@@ -231,14 +215,5 @@ public class Demo {
             System.out.println("  [ПЕРЕХВАЧЕНО ОЖИДАЕМОЕ ПРОВЕРЯЕМОЕ ИСКЛЮЧЕНИЕ]: " + ex.getClass().getSimpleName());
             System.out.println("  Бизнес-причина: " + ex.getMessage());
         }
-
-        // ---------------------------------------------------------------------
-        // ИТОГ ПО ОБЪЕКТАМ
-        // ---------------------------------------------------------------------
-        System.out.println("\n==========================================================================");
-        System.out.printf("ИТОГО: создано и задействовано в демонстрации %d объектов предметной области.%n",
-                allCreatedObjects.size());
-        System.out.println("Все требования базового уровня и критерии демонстрации полностью выполнены.");
-        System.out.println("==========================================================================");
     }
 }
